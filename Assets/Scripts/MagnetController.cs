@@ -9,7 +9,7 @@ public class MagnetController : MonoBehaviour
     public float rotationAngle;
     public Transform parentNode;
     public bool test = false;
-    public GameObject cubePrefab;
+    public GameObject diffusableCubePrefab;
     private Color ballColor;
 
 
@@ -28,18 +28,12 @@ public class MagnetController : MonoBehaviour
         if (tag == "Head")
         {
             GameManager.instance.collected.Push(transform);
+            GameManager.instance.startPoint = transform.position;
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //if (lerpFromRight)
-        //{
-        //    transform.parent.rotation = Quaternion.Lerp(transform.parent.rotation, Quaternion.Euler(0, 90, 0), 5f * Time.deltaTime);
-        //}
-
-
         if (isLerp)
         {
             if (lerpFromRight)
@@ -83,8 +77,6 @@ public class MagnetController : MonoBehaviour
             other.GetComponent<BoxCollider>().size = Vector3.one;
             GameManager.instance.collected.Push(other.transform);
 
-            print(transform.InverseTransformPoint(other.transform.position).x);
-
             var relativeLocationXAxis = transform.InverseTransformPoint(other.transform.position).x;
 
             other.transform.GetComponent<MagnetController>().parentNode = transform;
@@ -94,7 +86,7 @@ public class MagnetController : MonoBehaviour
                 //other.transform.position = new Vector3(transform.position.x + .75f, transform.position.y, transform.position.z + 1f);
                 other.transform.GetComponent<MagnetController>().rotationAngle = -90;
                 other.transform.GetComponent<MagnetController>().isLerp = true;
-                AudioManager.instance.PlayEdgeCollisionSound();
+                AudioManager.instance.PlaySound(CollisionType.EdgeCollision);
             }
             else if (relativeLocationXAxis <= -0.75)
             {
@@ -102,24 +94,23 @@ public class MagnetController : MonoBehaviour
                 other.transform.GetComponent<MagnetController>().rotationAngle = 90;
                 other.transform.GetComponent<MagnetController>().lerpFromRight = true;
                 other.transform.GetComponent<MagnetController>().isLerp = true;
-                AudioManager.instance.PlayEdgeCollisionSound();
+                AudioManager.instance.PlaySound(CollisionType.EdgeCollision);
 
             }
             else
             {
                 other.transform.GetComponent<MagnetController>().AttachNewNode();
-                AudioManager.instance.PlayDirectCollisionSound();
+                AudioManager.instance.PlaySound(CollisionType.DirectCollision);
             }
 
             CameraController.instance.target = other.transform;
         }
         else if (transform.CompareTag("Head") && other.CompareTag("MagneticField"))
         {
-            if (other.transform.parent.transform.GetComponent<MagnetPhysics>().capacity > 0)
+            if (other.transform.parent.transform.GetComponent<ObstacleController>().capacity > 0)
             {
-                print("Here");
                 gameObject.SetActive(false);
-                var newCubePrefab = Instantiate(cubePrefab, transform);
+                var newCubePrefab = Instantiate(diffusableCubePrefab, transform);
                 for (int i = 0; i < newCubePrefab.transform.childCount; i++)
                 {
                     newCubePrefab.transform.GetChild(i).transform.GetComponent<MeshRenderer>().material.color = ballColor;

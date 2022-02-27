@@ -7,6 +7,8 @@ public class AudioManager : MonoBehaviour
 {
     public Sound[] directCollision;
     public Sound[] edgeCollision;
+    public Sound[] obstacleCollision;
+    int order = 0;
 
     public static AudioManager instance;
     // Start is called before the first frame update
@@ -38,20 +40,39 @@ public class AudioManager : MonoBehaviour
             sound.source.volume = sound.volume;
             sound.source.pitch = 1;
         }
+
+        foreach (var sound in obstacleCollision)
+        {
+            sound.source = gameObject.AddComponent<AudioSource>();
+            sound.source.clip = sound.clip;
+
+            sound.source.volume = sound.volume;
+            sound.source.pitch = 1;
+        }
     }
 
-    public void PlayDirectCollisionSound()
+    public void PlaySound(CollisionType collisionType)
     {
-        int random = Random.Range(0, directCollision.Length);
+        var soundArray = new Sound[0];
 
-        directCollision[random].source.Play();
-    }
+        switch (collisionType)
+        {
+            case CollisionType.DirectCollision:
+                soundArray = directCollision;
+                break;
+            case CollisionType.EdgeCollision:
+                soundArray = edgeCollision;
+                break;
+            case CollisionType.ObstacleCollision:
+                soundArray=obstacleCollision;
+                break;
+            default:
+                break;
+        }
 
-    public void PlayEdgeCollisionSound()
-    {
-        int random = Random.Range(0, edgeCollision.Length);
-
-        edgeCollision[random].source.Play();
+        int random = Random.Range(0, soundArray.Length);
+        soundArray[random].source.Play();
+        //order = (order + 1) % soundArray.Length;
     }
 
 

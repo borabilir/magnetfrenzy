@@ -10,6 +10,7 @@ TagManager:
   - MagneticField
   - Head
   - DiffusibleCube
+  - LevelEnd
   layers:
   - Default
   - TransparentFX
