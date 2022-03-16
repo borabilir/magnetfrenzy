@@ -31,8 +31,8 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        currentLevelText.text = currentLevel.ToString();
-        nextLevelText.text = (currentLevel + 1).ToString();
+        // currentLevelText.text = currentLevel.ToString();
+        // nextLevelText.text = (currentLevel + 1).ToString();
 
     }
 
